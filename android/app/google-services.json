@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "309435805989",
+    "project_id": "owe-me-5fc6d",
+    "storage_bucket": "owe-me-5fc6d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309435805989:android:9ea022f4c1714300e62acc",
+        "android_client_info": {
+          "package_name": "com.dev.owe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309435805989-6gmj8igi4c7plcnopbgc3k47vlr2fn4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADUAFka8ZhSAHyWiZv9eYURxZFEltkGos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309435805989-6gmj8igi4c7plcnopbgc3k47vlr2fn4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
