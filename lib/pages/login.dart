@@ -9,10 +9,16 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   //Variables
+
+  //Controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  //Check Eye Icon status
   Icon _eyeState = Icon(Icons.visibility_off);
   bool _visible = false;
+
+  //Validation
   bool _validateEmail = true;
   bool _validatePassword = true;
 
@@ -21,6 +27,8 @@ class _LoginState extends State<Login> {
     //Locally imported colors
     Color _primary = Theme.of(context).primaryColor;
     Color _primaryDark = Theme.of(context).primaryColorDark;
+
+    //Login Page Layout
     return Scaffold(
       //Custom Background Color
       backgroundColor: _primary,
@@ -30,12 +38,11 @@ class _LoginState extends State<Login> {
           elevation: 0.0,
           toolbarHeight: 90,
           titleSpacing: 30,
-          backgroundColor: _primary,
 
-          //Title and Sub-title
+          //Title
           title: Text(
             'Login To Continue',
-            style: TextStyle(color: _primaryDark, fontSize: 18),
+            style: TextStyle(fontSize: 18),
           )),
 
       //Body
@@ -43,6 +50,7 @@ class _LoginState extends State<Login> {
           child: ListView(
         padding: EdgeInsets.all(30),
         children: <Widget>[
+          //Spacing from Top
           SizedBox(
             height: 120.0,
           ),
@@ -51,13 +59,11 @@ class _LoginState extends State<Login> {
           TextField(
             controller: _emailController,
             cursorColor: _primaryDark,
-            style: TextStyle(color: _primaryDark),
             textInputAction: TextInputAction.next,
             //Text Field Styling
             decoration: InputDecoration(
               labelText: "Username or Email",
               errorText: _validateEmail ? null : "Enter email address",
-              labelStyle: TextStyle(color: _primaryDark),
             ),
           ),
 
@@ -69,29 +75,20 @@ class _LoginState extends State<Login> {
           TextField(
             controller: _passwordController,
             cursorColor: _primaryDark,
-            style: TextStyle(color: _primaryDark),
+            textInputAction: TextInputAction.done,
+            obscureText: !_visible,
             //Text Field Styling
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 icon: _eyeState,
                 color: _primaryDark,
                 onPressed: () {
-                  setState(() {
-                    if (_visible) {
-                      _eyeState = Icon(Icons.visibility_off);
-                      _visible = false;
-                    } else {
-                      _eyeState = Icon(Icons.visibility);
-                      _visible = true;
-                    }
-                  });
+                  visibilityChange();
                 },
               ),
               labelText: "Password",
               errorText: _validatePassword ? null : "Enter password",
-              labelStyle: TextStyle(color: _primaryDark),
             ),
-            obscureText: !_visible,
           ),
 
           SizedBox(
@@ -103,27 +100,22 @@ class _LoginState extends State<Login> {
             children: <Widget>[
               //Cancel
               TextButton(
-                  onPressed: () {
-                    _emailController.clear();
-                    _passwordController.clear();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: _primaryDark),
-                  )),
+                onPressed: () {
+                  //Clear text fields
+                  _emailController.clear();
+                  _passwordController.clear();
+                },
+                child: Text(
+                  'Clear',
+                  style: TextStyle(color: _primaryDark),
+                ),
+              ),
 
               //Next
               ElevatedButton(
                 onPressed: () async {
-                  setState(() {
-                    _emailController.text.isNotEmpty
-                        ? _validateEmail = true
-                        : _validateEmail = false;
-                    _passwordController.text.isNotEmpty
-                        ? _validatePassword = true
-                        : _validatePassword = false;
-                  });
-                  if (_validateEmail && _validatePassword) {
+                  //Check if fields are not empty, go to home if login successful
+                  if (checkFields()) {
                     bool isLoggedIn = await AuthService().loginUser(
                         _emailController.text, _passwordController.text);
                     isLoggedIn
@@ -131,7 +123,9 @@ class _LoginState extends State<Login> {
                         : null;
                   }
                 },
-                child: Text('Next', style: TextStyle(color: _primary)),
+                child: Text(
+                  'Next',
+                ),
               ),
             ],
           ),
@@ -167,5 +161,30 @@ class _LoginState extends State<Login> {
         ],
       )),
     );
+  }
+
+  void visibilityChange() {
+    setState(() {
+      if (_visible) {
+        _eyeState = Icon(Icons.visibility_off);
+        _visible = false;
+      } else {
+        _eyeState = Icon(Icons.visibility);
+        _visible = true;
+      }
+    });
+  }
+
+  bool checkFields() {
+    setState(() {
+      _emailController.text.isNotEmpty
+          ? _validateEmail = true
+          : _validateEmail = false;
+      _passwordController.text.isNotEmpty
+          ? _validatePassword = true
+          : _validatePassword = false;
+    });
+
+    return _validateEmail && _validatePassword;
   }
 }

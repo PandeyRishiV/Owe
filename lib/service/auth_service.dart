@@ -6,12 +6,13 @@ class AuthService {
   //Check Logged In User
 
   //Register
-  Future<bool> registerUser(String email, String password) async {
+  Future<bool> registerUser(
+      String email, String verificationId, String otp) async {
     try {
-      await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId, smsCode: otp);
+      await auth.signInWithCredential(credential);
       //DatabaseService().createUser(auth.currentUser!.uid, email);
-      print("--------------------------" + email + "-------------" + password);
       return true;
     } catch (e) {
       print(e.toString());

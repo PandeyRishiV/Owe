@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:owe/pages/contacts.dart';
 import 'package:owe/pages/records.dart';

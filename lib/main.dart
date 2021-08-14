@@ -28,14 +28,20 @@ class MyApp extends StatelessWidget {
         primaryColorDark: primaryDark,
         accentColor: accent,
 
+        //Text Style
+        textTheme: TextTheme(bodyText2: TextStyle(color: primaryDark)),
+
         //Text Field
         inputDecorationTheme: InputDecorationTheme(
+            labelStyle: TextStyle(color: primaryDark),
             focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: primaryDark)),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: primaryDark)),
             border: UnderlineInputBorder(
                 borderSide: BorderSide(color: primaryDark))),
+
+        iconTheme: IconThemeData(color: primaryDark),
 
         // Elevated Button
         elevatedButtonTheme: ElevatedButtonThemeData(
