@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:contacts_service/contacts_service.dart';
+import 'package:owe/models/ContactInfo.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
@@ -43,9 +46,20 @@ class _ContactsState extends State<Contacts> {
         if (value.isEmpty) {
           _body = emptyPage();
         } else {
-          value.toList().removeWhere((element) =>
-              element.androidAccountType != AndroidAccountType.google);
-          _body = contactPage(value);
+          List<ContactInfo> contacts = [];
+          value.forEach((element) {
+            if (element.phones != null &&
+                element.phones!.isNotEmpty &&
+                element.displayName != null) {
+              List<String> phones = [];
+              element.phones!.forEach((phone) {
+                phones.add(phone.value!);
+              });
+              ContactInfo info = new ContactInfo(element.displayName!, phones);
+              contacts.add(info);
+            }
+          });
+          _body = contactPage(contacts);
         }
         setState(() {
           _bodyLoaded = true;
@@ -76,7 +90,7 @@ class _ContactsState extends State<Contacts> {
     );
   }
 
-  Widget contactPage(Iterable<Contact> contacts) {
+  Widget contactPage(List<ContactInfo> contacts) {
     return ListView.builder(
         padding: EdgeInsets.only(top: 10),
         shrinkWrap: true,
@@ -89,22 +103,14 @@ class _ContactsState extends State<Contacts> {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              contacts.toList().elementAt(index).displayName.toString(),
+              contacts.elementAt(index).name,
               style: TextStyle(color: Colors.black),
             ),
-            // subtitle: Text(
-            //   test(contacts.toList().elementAt(index)),
-            //   style: TextStyle(color: Colors.black),
-            // ),
+            subtitle: Text(
+              contacts.elementAt(index).phones[0],
+              style: TextStyle(color: Colors.black),
+            ),
           );
         });
-  }
-
-  String test(Contact contact) {
-    Iterable<Item>? phone = contact.phones;
-    if (phone!.toList().isNotEmpty) {
-      return phone.toList().elementAt(0).value.toString();
-    }
-    return "null";
   }
 }
