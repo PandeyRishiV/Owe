@@ -18,9 +18,6 @@ class _HomeState extends State<Home> {
     Color _primaryDark = Theme.of(context).primaryColorDark;
     Color _accent = Theme.of(context).accentColor;
 
-    Widget _contactUsBody = CircularProgressIndicator(
-        color: _primaryDark, backgroundColor: _primary);
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -30,7 +27,9 @@ class _HomeState extends State<Home> {
         //App Bar
         appBar: AppBar(
           //Three Dot Icon
-          actionsIconTheme: IconThemeData(color: _primaryDark),
+          actionsIconTheme: IconThemeData(
+            color: _primaryDark,
+          ),
           actions: <Widget>[
             PopupMenuButton<String>(
                 onSelected: dotMenuHandler,

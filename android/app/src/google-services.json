@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "309435805989",
+    "firebase_url": "https://owe-me-5fc6d-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "owe-me-5fc6d",
     "storage_bucket": "owe-me-5fc6d.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "309435805989-60oh5gp7fvb346rgtmgtolfqf3nmbceo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.owe",
+            "certificate_hash": "ea90780459ca18c4a5008d94d95de9e5461f72a6"
+          }
+        },
         {
           "client_id": "309435805989-6gmj8igi4c7plcnopbgc3k47vlr2fn4d.apps.googleusercontent.com",
           "client_type": 3

@@ -78,32 +78,30 @@ class _ContactsState extends State<Contacts> {
 
   Widget contactPage(Iterable<Contact> contacts) {
     return ListView.builder(
+        padding: EdgeInsets.only(top: 10),
         shrinkWrap: true,
         physics: AlwaysScrollableScrollPhysics(),
         itemCount: contacts.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
+            leading: Icon(
+              Icons.person_rounded,
+              color: Theme.of(context).primaryColor,
+            ),
             title: Text(
               contacts.toList().elementAt(index).displayName.toString(),
               style: TextStyle(color: Colors.black),
             ),
-            subtitle: Text(
-              // contacts
-              //     .toList()
-              //     .elementAt(index)
-              //     .emails!
-              //     .toList()
-              //     .elementAt(0)
-              //     .toString()
-              test(contacts.toList().elementAt(index)),
-              style: TextStyle(color: Colors.black),
-            ),
+            // subtitle: Text(
+            //   test(contacts.toList().elementAt(index)),
+            //   style: TextStyle(color: Colors.black),
+            // ),
           );
         });
   }
 
   String test(Contact contact) {
-    Iterable<Item>? phone = contact.emails;
+    Iterable<Item>? phone = contact.phones;
     if (phone!.toList().isNotEmpty) {
       return phone.toList().elementAt(0).value.toString();
     }

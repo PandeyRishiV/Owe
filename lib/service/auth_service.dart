@@ -6,8 +6,7 @@ class AuthService {
   //Check Logged In User
 
   //Register
-  Future<bool> registerUser(
-      String email, String verificationId, String otp) async {
+  Future<bool> signInUser(String verificationId, String otp) async {
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: verificationId, smsCode: otp);
