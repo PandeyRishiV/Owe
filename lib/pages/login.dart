@@ -181,7 +181,7 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> proceedToLogin(String otp) async {
-    bool isLoggedIn = await AuthService().signInUser(_verificationID, otp);
+    bool isLoggedIn = await AuthService().signUpUser(_verificationID, otp);
 
     isLoggedIn
         ? Navigator.pushReplacementNamed(context, "/home")

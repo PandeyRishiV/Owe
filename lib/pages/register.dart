@@ -180,7 +180,7 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> proceedToLogin(String otp) async {
-    bool isRegistered = await AuthService().signInUser(_verificationID, otp);
+    bool isRegistered = await AuthService().signUpUser(_verificationID, otp);
 
     isRegistered
         ? Navigator.pushReplacementNamed(context, "/home")
