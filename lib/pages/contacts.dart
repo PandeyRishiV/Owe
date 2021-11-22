@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:contacts_service/contacts_service.dart';
 import 'package:owe/models/ContactInfo.dart';
+import 'package:owe/pages/chatScreen.dart';
+import 'package:owe/service/database_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
@@ -42,24 +44,26 @@ class _ContactsState extends State<Contacts> {
 
   void areThereContacts() {
     [Permission.contacts].request().then((value) {
-      ContactsService.getContacts(withThumbnails: false).then((value) {
+      ContactsService.getContacts(withThumbnails: false).then((value) async {
         if (value.isEmpty) {
           _body = emptyPage();
         } else {
           List<ContactInfo> contacts = [];
-          value.forEach((element) {
-            if (element.phones != null &&
-                element.phones!.isNotEmpty &&
-                element.displayName != null) {
-              List<String> phones = [];
-              element.phones!.forEach((phone) {
-                phones.add(phone.value!);
-              });
-              ContactInfo info = new ContactInfo(element.displayName!, phones);
-              contacts.add(info);
-            }
+          value.toList().removeWhere((element) =>
+              element.phones == null ||
+              element.phones!.isEmpty ||
+              element.displayName!.isEmpty);
+          value.forEach((contact) {
+            contact.phones!.forEach((phone) {
+              ContactInfo newContact = new ContactInfo(
+                  contact.displayName.toString(), phone.value.toString(), "");
+              contacts.add(newContact);
+            });
           });
-          _body = contactPage(contacts);
+
+          _body = contactPage(await DatabaseService()
+                  .isContactRegistered(Stream.fromIterable(contacts))
+              as List<ContactInfo>);
         }
         setState(() {
           _bodyLoaded = true;
@@ -107,9 +111,16 @@ class _ContactsState extends State<Contacts> {
               style: TextStyle(color: Colors.black),
             ),
             subtitle: Text(
-              contacts.elementAt(index).phones[0],
+              contacts.elementAt(index).phone,
               style: TextStyle(color: Colors.black),
             ),
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ChatScreen(user: contacts.elementAt(index))));
+            },
           );
         });
   }

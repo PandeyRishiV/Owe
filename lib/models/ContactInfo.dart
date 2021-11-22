@@ -1,9 +1,11 @@
 class ContactInfo {
   final String name;
-  final List<String> phones;
+  final String phone;
+  String uid;
 
-  const ContactInfo(
+  ContactInfo(
     this.name,
-    this.phones,
+    this.phone,
+    this.uid,
   );
 }
