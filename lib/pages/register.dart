@@ -16,27 +16,24 @@ class _RegisterState extends State<Register> {
   String _verificationID = "";
   String _otp = "";
   bool _registerBody = true;
+  Color _primary = Colors.white;
+  Color _primaryDark = Colors.white;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _primary = Theme.of(context).primaryColor;
+    _primaryDark = Theme.of(context).primaryColorDark;
+  }
 
   //Controllers
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  //Password Icons
-  Icon _eyeState = Icon(Icons.visibility_off);
-  bool _visible = false;
-
   //Error message check
-  bool _validateEmail = true;
-  bool _validatePassword = true;
   bool _validatePhone = true;
 
   @override
   Widget build(BuildContext context) {
-    //Locally imported colors
-    Color _primary = Theme.of(context).primaryColor;
-    Color _primaryDark = Theme.of(context).primaryColorDark;
-
     return Scaffold(
       //BG COLOR
       backgroundColor: _primary,
@@ -68,46 +65,6 @@ class _RegisterState extends State<Register> {
           height: 100.0,
         ),
 
-        //Email Text Field
-        TextField(
-          controller: _emailController,
-          cursorColor: _primaryDark,
-          textInputAction: TextInputAction.next,
-
-          //Text Field Styling
-          decoration: InputDecoration(
-            labelText: "Email Address",
-          ),
-        ),
-
-        SizedBox(
-          height: 12.0,
-        ),
-
-        //Password Text Field
-        TextField(
-          controller: _passwordController,
-          cursorColor: _primaryDark,
-          textInputAction: TextInputAction.next,
-          obscureText: !_visible,
-
-          //Text Field Styling
-          decoration: InputDecoration(
-            suffixIcon: IconButton(
-              icon: _eyeState,
-              color: _primaryDark,
-              onPressed: () {
-                visibilityChange();
-              },
-            ),
-            labelText: "Password",
-          ),
-        ),
-
-        SizedBox(
-          height: 12.0,
-        ),
-
         //PhoneText Field
         TextField(
           controller: _phoneController,
@@ -135,8 +92,6 @@ class _RegisterState extends State<Register> {
             //Cancel
             TextButton(
               onPressed: () {
-                _emailController.clear();
-                _passwordController.clear();
                 _phoneController.clear();
               },
               child: Text(
@@ -162,21 +117,6 @@ class _RegisterState extends State<Register> {
                 child: Text('Next')),
           ],
         ),
-
-        SizedBox(
-          height: 120,
-        ),
-
-        //Back to login screen
-        TextButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, "/login");
-          },
-          child: Text(
-            "Already have an account",
-            style: TextStyle(color: _primaryDark),
-          ),
-        )
       ],
     );
   }
@@ -210,36 +150,15 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  void visibilityChange() {
-    setState(() {
-      if (_visible) {
-        _eyeState = Icon(Icons.visibility_off);
-        _visible = false;
-      } else {
-        _eyeState = Icon(Icons.visibility);
-        _visible = true;
-      }
-    });
-  }
-
   bool validateFields() {
     setState(() {
       //Checking and setting error texts if necessary
-      _emailController.text.isNotEmpty
-          ? _validateEmail = true
-          : _validatePassword = false;
-      _passwordController.text.isNotEmpty
-          ? _validatePassword = true
-          : _validatePassword = false;
       _phoneController.text.isNotEmpty
           ? _validatePhone = true
           : _validatePhone = false;
     });
 
-    return _validateEmail &&
-        _validatePassword &&
-        _validatePhone &&
-        _phoneController.text.length == 10;
+    return _validatePhone && _phoneController.text.length == 10;
   }
 
   Future<void> verifyPhone(String phone) async {
@@ -266,8 +185,7 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> proceedToLogin(String otp) async {
-    bool isRegistered = await AuthService()
-        .registerUser(_emailController.text, _verificationID, otp);
+    bool isRegistered = await AuthService().signUpUser(_verificationID, otp);
 
     isRegistered
         ? Navigator.pushReplacementNamed(context, "/home")

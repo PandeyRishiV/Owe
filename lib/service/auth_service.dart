@@ -1,18 +1,21 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'database_service.dart';
 
 class AuthService {
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  //Check Logged In User
-
   //Register
-  Future<bool> registerUser(
-      String email, String verificationId, String otp) async {
+  Future<bool> signUpUser(String verificationId, String otp) async {
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: verificationId, smsCode: otp);
-      await auth.signInWithCredential(credential);
-      //DatabaseService().createUser(auth.currentUser!.uid, email);
+      await auth.signInWithCredential(credential).whenComplete(() {
+        DatabaseService().registerContact(
+            auth.currentUser!.phoneNumber.toString(), auth.currentUser!.uid);
+        log("================================>" + auth.currentUser!.toString());
+      });
       return true;
     } catch (e) {
       print(e.toString());
