@@ -1,8 +1,10 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:owe/models/Chat.dart';
 import 'package:owe/models/ContactInfo.dart';
+
+List<ContactInfo> usersContacts = [];
 
 class DatabaseService {
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
@@ -22,45 +24,94 @@ class DatabaseService {
   }
 
   //Check user's contacts (One at a time)
-  Future<List> isContactRegistered(Stream<ContactInfo> allContacts) async {
+  Future<bool> isContactRegistered(Stream<ContactInfo> allContacts) async {
     List<ContactInfo> registered = [];
     List<String> uids = [];
     try {
-      DataSnapshot s = await _databaseReference.child('users').once();
-      //TODO FIND A BETTER FUCKING WAY TO USE UIDS
+      DataSnapshot contactsListSnapshot =
+          await _databaseReference.child('users').once();
       await for (ContactInfo contact in allContacts) {
-        if (s.value[contact.phone] != null &&
-            !uids.contains(s.value[contact.phone].values.toList()[0]['uid'])) {
-          String uid = s.value[contact.phone].values.toList()[0]['uid'];
+        if (contactsListSnapshot.value[contact.phone] != null &&
+            !uids.contains(contactsListSnapshot.value[contact.phone].values
+                .toList()[0]['uid'])) {
+          String uid = contactsListSnapshot.value[contact.phone].values
+              .toList()[0]['uid'];
           uids.add(uid);
           contact.uid = uid;
           registered.add(contact);
         }
       }
-      return registered;
+      usersContacts = registered;
+      return true;
     } catch (e) {
       print(e.toString());
-      return registered;
+      return false;
     }
   }
 
-  // <String> isContactRegistered(Stream<String> allContacts) async* {
-  //   try {
-  //     await for (final phone in allContacts) {
-  //       DataSnapshot s =
-  //           await _databaseReference.child('users').child(phone).once();
-  //       if (s.value != null) {
-  //         yield s.value.toString();
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print(e.toString());
-  //   }
-  // }
-
   //Get chat list
+  Future<List<ContactInfo>> getConversationList(String uid) async {
+    List<String> uids = [];
+    try {
+      DataSnapshot contactsUid =
+          await _databaseReference.child("conversation").child(uid).once();
+      contactsUid.value.forEach((key, value) {
+        uids.add(key.toString());
+      });
+      List<ContactInfo> recordContacts =
+          usersContacts.where((contact) => uids.contains(contact.uid)).toList();
+      return recordContacts;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
 
   //Get one chat
+  Future<List<Chat>> getConversation(String uid, String recipuentUid) async {
+    try {
+      List<Chat> chats = [];
+      DataSnapshot chatsSnapshot = await _databaseReference
+          .child("conversation")
+          .child(uid)
+          .child(recipuentUid)
+          .orderByValue()
+          .once();
+      chatsSnapshot.value.forEach((key, value) {
+        Chat newText = new Chat(
+            value['text'], DateTime.parse(value['timestamp']), value['sender']);
+        chats.add(newText);
+      });
+      chats.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+      chats = chats.reversed.toList();
+      log(chats.length.toString());
+      return chats;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
 
   //Send text
+  Future<bool> sendText(
+      String text, String uid, String recipientUid, String timeStamp) async {
+    try {
+      await _databaseReference
+          .child('conversation')
+          .child(uid)
+          .child(recipientUid)
+          .push()
+          .set({"text": text, "timestamp": timeStamp, "sender": true});
+      await _databaseReference
+          .child("conversation")
+          .child(recipientUid)
+          .child(uid)
+          .push()
+          .set({"text": text, "timestamp": timeStamp, "sender": false});
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }

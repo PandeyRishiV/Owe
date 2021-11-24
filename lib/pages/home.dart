@@ -1,7 +1,11 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:owe/models/ContactInfo.dart';
 import 'package:owe/pages/contacts.dart';
 import 'package:owe/pages/records.dart';
 import 'package:owe/service/auth_service.dart';
+import 'package:owe/service/database_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -11,13 +15,43 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Color _primary = Colors.white;
+  Color _primaryDark = Colors.white;
+  Color _accent = Colors.white;
+
+  @override
+  void initState() {
+    super.initState();
+    getAllContacts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _primary = Theme.of(context).primaryColor;
+    _primaryDark = Theme.of(context).primaryColorDark;
+    _accent = Theme.of(context).accentColor;
+  }
+
+  bool _contactsRecieved = false;
+
   @override
   Widget build(BuildContext context) {
-    //Locally imported colors
-    Color _primary = Theme.of(context).primaryColor;
-    Color _primaryDark = Theme.of(context).primaryColorDark;
-    Color _accent = Theme.of(context).accentColor;
+    return _contactsRecieved ? _tabbedLayout() : _progressBar();
+  }
 
+  Widget _progressBar() {
+    return Container(
+      color: _accent,
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(
+        color: _primaryDark,
+        backgroundColor: _primary,
+      ),
+    );
+  }
+
+  Widget _tabbedLayout() {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -84,7 +118,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> dotMenuHandler(String value) async {
+  void dotMenuHandler(String value) async {
     switch (value) {
       case 'Logout':
         bool result = await AuthService().signoutUser();
@@ -95,12 +129,40 @@ class _HomeState extends State<Home> {
             SnackBar(
               content: Text(
                 "Some Error occured, Try Again",
-                style: TextStyle(color: Theme.of(context).primaryColorDark),
+                style: TextStyle(color: _primaryDark),
               ),
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: _primary,
             ),
           );
         }
     }
+  }
+
+  void getAllContacts() {
+    [Permission.contacts].request().then((value) {
+      ContactsService.getContacts(withThumbnails: false).then((value) async {
+        if (value.isEmpty) {
+        } else {
+          List<ContactInfo> contacts = [];
+          value.toList().removeWhere((element) =>
+              element.phones == null ||
+              element.phones!.isEmpty ||
+              element.displayName!.isEmpty);
+          value.forEach((contact) {
+            contact.phones!.forEach((phone) {
+              ContactInfo newContact = new ContactInfo(
+                  contact.displayName.toString(), phone.value.toString(), "");
+              contacts.add(newContact);
+            });
+          });
+
+          bool result = await DatabaseService()
+              .isContactRegistered(Stream.fromIterable(contacts));
+          setState(() {
+            _contactsRecieved = result;
+          });
+        }
+      });
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:contacts_service/contacts_service.dart';
@@ -18,6 +19,9 @@ class _ContactsState extends State<Contacts> {
   Widget _body = Scaffold();
   Widget _progressBar = Scaffold();
   bool _bodyLoaded = false;
+  Color _primary = Colors.white;
+  Color _primaryDark = Colors.white;
+  Color _accent = Colors.white;
 
   @override
   void initState() {
@@ -26,12 +30,16 @@ class _ContactsState extends State<Contacts> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     //Locally imported colors
-    Color _primary = Theme.of(context).primaryColor;
-    Color _primaryDark = Theme.of(context).primaryColorDark;
-    Color _accent = Theme.of(context).accentColor;
+    _primary = Theme.of(context).primaryColor;
+    _primaryDark = Theme.of(context).primaryColorDark;
+    _accent = Theme.of(context).accentColor;
+  }
 
+  @override
+  Widget build(BuildContext context) {
     _progressBar = Center(
       child: CircularProgressIndicator(
         color: _primaryDark,
@@ -61,9 +69,9 @@ class _ContactsState extends State<Contacts> {
             });
           });
 
-          _body = contactPage(await DatabaseService()
-                  .isContactRegistered(Stream.fromIterable(contacts))
-              as List<ContactInfo>);
+          //TODO Add refresh button
+
+          _body = contactPage(usersContacts);
         }
         setState(() {
           _bodyLoaded = true;
@@ -115,7 +123,7 @@ class _ContactsState extends State<Contacts> {
               style: TextStyle(color: Colors.black),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>

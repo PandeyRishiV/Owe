@@ -17,6 +17,15 @@ class _LoginState extends State<Login> {
   String _intlCode = "+91";
   String _otp = "";
   bool _loginBody = true;
+  Color _primary = Colors.white;
+  Color _primaryDark = Colors.white;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _primary = Theme.of(context).primaryColor;
+    _primaryDark = Theme.of(context).primaryColorDark;
+  }
 
   //Controllers
   final _phoneController = TextEditingController();
@@ -26,10 +35,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    //Locally imported colors
-    Color _primary = Theme.of(context).primaryColor;
-    Color _primaryDark = Theme.of(context).primaryColorDark;
-
     return Scaffold(
       //BG COLOR
       backgroundColor: _primary,
